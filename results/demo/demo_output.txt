@@ -1,0 +1,62 @@
+
+=== 1. Input: a generated puzzle rendered from MNIST digits ===
+Mosaic (272, 272), 30 givens, seed 7007. Injected misreads: ['R2C7', 'R5C7']
+
+=== 2. Neural network reads the image ===
+  7 . . | . . . | 3 8 . 
+  . . . | . . . | 4* . 4*
+  . . . | . 8 6 | . . . 
+  ------+-------+------
+  . 6 . | 7 . 9 | . . . 
+  . . 1 | 6 3 5 | 7* . 7*
+  5 . 4 | . 2 . | . 9 . 
+  ------+-------+------
+  8 . . | . . . | . . 9 
+  4 5 . | . . . | . 3 . 
+  . . 3 | 4 1 7 | 5 . . 
+(* marks a duplicate digit)
+  R5C7: 7 (53%) vs 8 (26%)
+  R2C7: 4 (90%) vs 9 (6%)
+  R8C2: 5 (100%) vs 8 (0%)
+
+=== 3. AC-3 checks the reading ===
+CONFLICT: a domain was emptied. Duplicate pairs: [('R2C7', 'R2C9'), ('R5C7', 'R5C9')]
+
+=== 4. ASTAR search over corrections (goal: unique), NN ON ===
+Nodes expanded 5, generated 134, CSP calls 2
+  #1    cost  0.000  (first reading)                    has duplicates
+  #2    cost  2.727  R2C7=9                             has duplicates
+  #3    cost  0.723  R5C7=8                             has duplicates
+  #4    cost  3.450  R2C7=9, R5C7=8                     CSP rejected
+  #5    cost  1.457  R5C7=2                             has duplicates
+  #6    cost  4.184  R2C7=9, R5C7=2                     ACCEPTED
+
+=== 5. Correction log ===
+  R2C7: read 4 -> 9 (cost 2.7267)
+  R5C7: read 7 -> 2 (cost 1.4572)
+Solved with 2 correction(s), total cost 4.184
+
+=== 6. CSP solution ===
+  7 2 5 | 1 9 4 | 3 8 6 
+  6 3 8 | 5 7 2 | 9* 1 4 
+  1 4 9 | 3 8 6 | 7 2 5 
+  ------+-------+------
+  3 6 2 | 7 4 9 | 8 5 1 
+  9 8 1 | 6 3 5 | 2* 4 7 
+  5 7 4 | 8 2 1 | 6 9 3 
+  ------+-------+------
+  8 1 6 | 2 5 3 | 4 7 9 
+  4 5 7 | 9 6 8 | 1 3 2 
+  2 9 3 | 4 1 7 | 5 6 8 
+Matches the true solution: True
+
+=== 7. CSP pruning on this puzzle (no MRV, so only inference differs) ===
+  BT          assignments   2,693  backtracks   2,642  values pruned      0
+  BT+FC       assignments     210  backtracks     159  values pruned    891
+  BT+FC+AC-3  assignments     210  backtracks     159  values pruned    871
+
+=== 8. System with the NN off (uniform costs, probabilities ignored) ===
+NN OFF: solved, nodes expanded 106, CSP calls 1, matches truth: False
+NN ON : solved, nodes expanded 5, CSP calls 2, matches truth: True
+
+Plots saved to results/demo
